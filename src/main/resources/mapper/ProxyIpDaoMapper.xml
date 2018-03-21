@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pachong.dao.ProxyIpDao">
+
+	<!-- 查询所有 -->
+	<select id="getList" resultType="com.pachong.entity.ProxyIp">
+		select pi_id,pi_ip,pi_port,pi_time
+		from
+		tb_proxyip
+	</select>
+	<!-- 根据id查询 IP -->
+	<select id="getIpById" resultType="com.pachong.entity.ProxyIp"
+		parameterType="string">
+		select pi_id,pi_ip,pi_port,pi_time from tb_proxyip
+		where pi_id=#{pi_id}
+	</select>
+	<!-- 更新 -->
+	<update id="update" parameterType="com.pachong.entity.ProxyIp">
+		update tb_proxyip
+		<set>
+			<if test="pi_ip!=null and pi_ip!=''">
+				pi_ip=#{pi_ip},
+			</if>
+			<if test="pi_port!=null and pi_port!=''">
+				pi_port=#{pi_port},
+			</if>
+			<if test="pi_time!=null and pi_time!=''">
+				pi_time=#{pi_time},
+			</if>
+
+		</set>
+		where pi_id=#{pi_id}
+	</update>
+</mapper>

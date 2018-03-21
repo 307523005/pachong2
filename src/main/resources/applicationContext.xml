@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.springframework.org/schema/aop
+	 http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+	<!-- 开启包扫描，指定扫描包的路径,如果想分包扫描，可以用,隔开，分别进行扫描,*通配符，也可以使用 -->
+    <context:component-scan base-package="com.pachong"></context:component-scan>
+    <!-- 加载配置文件 -->
+   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+       <property name="location" value="classpath:dbcp.properties"></property>
+   </bean>
+   <!-- 配置数据源(使用dbcp连接池技术) -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+        <!-- 初始化连接大小 -->
+	    <property name="initialSize" value="${initialSize}"></property>
+	    <!-- 连接池最大数量 -->
+	    <property name="maxActive" value="${maxActive}"></property>
+	    <!-- 连接池最大空闲 -->
+	    <property name="maxIdle" value="${maxIdle}"></property>
+	    <!-- 连接池最小空闲 -->
+	    <property name="minIdle" value="${minIdle}"></property>
+	    <!-- 获取连接最大等待时间 -->
+	    <property name="maxWait" value="${maxWait}"></property>
+    </bean>
+     <!-- 配置SqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 加载数据源 -->
+        <property name="dataSource" ref="dataSource"></property>
+        <!-- 扫描mapper文件 -->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+    </bean>
+     <!-- 开启dao接口扫描 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 扫描接口包路径，不需要加classpath，如果多个可以用“,”隔开 -->
+        <property name="basePackage" value="com.pachong.dao"></property>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+    
+     <!-- 配置事务 -->
+<!--     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+      加载数据源
+      <property name="dataSource" ref="dataSource"></property>
+    </bean> -->
+   <!-- 事务处理  -->
+   <!--    <aop:config>
+       <aop:pointcut expression="execution(* com.aaa.ssm.service..*.*(..))" id="trPointcut"/>
+        <aop:advisor advice-ref="trAdvice" pointcut-ref="trPointcut"/>
+    </aop:config>
+      <tx:advice id="trAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="*" propagation="REQUIRED" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>  -->
+  <!--  开启注解事务，如果这种，类上面加上@Transactional <tx:annotation-driven transaction-manager="transactionManager"/> -->
+    <!-- 开启事务扫描 -->
+     <tx:annotation-driven transaction-manager="transactionManager"/> 
+    
+    
+    <!--quartz 定时任务调度 开始 - 定义一个任务类 -->
+    <bean id="myJob" class="com.pachong.timetask.myJob"></bean>
+
+	<!-- jobDetail -->
+	<bean id="jobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="myJob"></property>
+		<property name="targetMethod" value="execute1"></property>
+		<property name="concurrent" value="false" /><!-- 作业不并发调度 -->
+	</bean>
+	<bean id="jobDetail2"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="myJob"></property>
+		<property name="targetMethod" value="execute2"></property>
+		<property name="concurrent" value="false" /><!-- 作业不并发调度 -->
+	</bean>
+	<bean id="jobDetail3"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="myJob"></property>
+		<property name="targetMethod" value="execute3"></property>
+		<property name="concurrent" value="false" /><!-- 作业不并发调度 -->
+	</bean>
+
+	<!-- 定义trigger 触发器 -->
+	<bean id="cronTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="jobDetail"></property>
+		 <property name="startDelay" value="10000" />
+		<property name="cronExpression" value="0 0/2 9-18 * * ?"></property>
+	</bean>
+	<bean id="cronTrigger2"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="jobDetail2"></property>
+				 <property name="startDelay" value="10000" />
+		<property name="cronExpression" value="0 0/5 9-18 * * ?"></property>
+	</bean>
+	<bean id="cronTrigger3"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="jobDetail3"></property>
+				 <property name="startDelay" value="10000" />
+		<property name="cronExpression" value="0 0/30 9-22 * * ?"></property>
+	</bean>
+	
+	 <bean id="scheduler"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+			<!-- 这里添加多个定时任务触发器，对应第2步的bean id  -->
+				<ref bean="cronTrigger" />
+				<ref bean="cronTrigger2" />
+				<ref bean="cronTrigger3" />
+			</list>
+		</property>
+	</bean> 
+	<!--quartz 定时任务调度 结束 -->
+	<!-- 每半分钟触发任务 -->
+	<!-- <task:scheduled ref="app" method="execute1" cron="30 * * * * ?"/> -->
+	<!-- 每小时的10分30秒触发任务 -->
+	<!-- <task:scheduled ref="app" method="execute2" cron="30 10 * * * ?"/> -->
+	<!-- 每天1点10分30秒触发任务 -->
+	<!-- <task:scheduled ref="app" method="execute3" cron="30 10 1 * * ?"/> -->
+	<!-- 每月20号的1点10分30秒触发任务 -->
+	<!-- <task:scheduled ref="app" method="execute4" cron="30 10 1 20 * ?"/> -->
+	<!-- 每年10月20号的1点10分30秒触发任务 -->
+	<!-- <task:scheduled ref="app" method="execute5" cron="30 10 1 20 10 ?"/> -->
+	<!-- 每15秒、30秒、45秒时触发任务 -->
+	<!-- <task:scheduled ref="app" method="execute6" cron="15,30,45 * * * * ?"/> -->
+	<!-- 15秒到45秒每隔1秒触发任务 -->
+	<!-- <task:scheduled ref="app" method="execute7" cron="15-45 * * * * ?"/> -->
+	<!-- 每分钟的每15秒时任务任务，每隔5秒触发一次 -->
+	<!-- <task:scheduled ref="app" method="execute8" cron="15/5 * * * * ?"/> -->
+	<!-- 每分钟的15到30秒之间开始触发，每隔5秒触发一次 -->
+	<!-- <task:scheduled ref="app" method="execute9" cron="15-30/5 * * * * ?"/> -->
+	<!-- 每小时的0分0秒开始触发，每隔3分钟触发一次 -->
+	<!-- <task:scheduled ref="app" method="execute10" cron="0 0/3 * * * ?"/> -->
+	<!-- 星期一到星期五的10点15分0秒触发任务 -->
+	<!-- <task:scheduled ref="app" method="execute11" cron="0 15 10 ? * MON-FRI"/> --> 
+        <!-- 0 0 10,14,16 * * ? 每天上午10点，下午2点，4点
+0 0/30 9-17 * * ?   朝九晚五工作时间内每半小时
+0 0 12 ? * WED 表示每个星期三中午12点 
+"0 0 12 * * ?" 每天中午12点触发 
+"0 15 10 ? * *" 每天上午10:15触发 
+"0 15 10 * * ?" 每天上午10:15触发 
+"0 15 10 * * ? *" 每天上午10:15触发 
+"0 15 10 * * ? 2005" 2005年的每天上午10:15触发 
+"0 * 14 * * ?" 在每天下午2点到下午2:59期间的每1分钟触发 
+"0 0/5 14 * * ?" 在每天下午2点到下午2:55期间的每5分钟触发 
+"0 0/5 14,18 * * ?" 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发 
+"0 0-5 14 * * ?" 在每天下午2点到下午2:05期间的每1分钟触发 
+"0 10,44 14 ? 3 WED" 每年三月的星期三的下午2:10和2:44触发 
+"0 15 10 ? * MON-FRI" 周一至周五的上午10:15触发 
+"0 15 10 15 * ?" 每月15日上午10:15触发 
+"0 15 10 L * ?" 每月最后一日的上午10:15触发 
+"0 15 10 ? * 6L" 每月的最后一个星期五上午10:15触发 
+"0 15 10 ? * 6L 2002-2005" 2002年至2005年的每月的最后一个星期五上午10:15触发 
+"0 15 10 ? * 6#3" 每月的第三个星期五上午10:15触发
+         -->
+        
+</beans>

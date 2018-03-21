@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pachong.dao.WeiBoDao">
+
+	<!-- 查询所有 -->
+	<select id="getList" resultType="com.pachong.entity.WeiBo">
+		select user_uid,
+				wb_content1,wb_content2,wb_content3,wb_content4,wb_content5,wb_content6,wb_content7,wb_content8,wb_content9,wb_content10,
+		wb_title1,wb_title2,wb_title3,wb_title4,wb_title5,wb_title6,wb_title7,wb_title8,wb_title9,wb_title10,wb_time
+		from tb_weibo
+	</select>
+	<!-- 根据uid查询 title -->
+	<select id="getTitleByUid" resultType="com.pachong.entity.WeiBo"
+		parameterType="string">
+		select user_uid,
+		wb_content1,wb_content2,wb_content3,wb_content4,wb_content5,wb_content6,wb_content7,wb_content8,wb_content9,wb_content10,
+		wb_title1,wb_title2,wb_title3,wb_title4,wb_title5,wb_title6,wb_title7,wb_title8,wb_title9,wb_title10,wb_time
+		from tb_weibo
+		where user_uid=#{user_uid}
+	</select>
+
+
+	<!-- 更新 -->
+	<update id="update" parameterType="com.pachong.entity.WeiBo">
+		update tb_weibo
+		<set>
+			<if test="user_uid!=null and user_uid!=''">
+				user_uid=#{user_uid},
+			</if>
+			<if test="wb_content1!=null and wb_content1!=''">
+				wb_content1=#{wb_content1},
+			</if>
+			<if test="wb_content2!=null and wb_content2!=''">
+				wb_content2=#{wb_content2},
+			</if>
+			<if test="wb_content3!=null and wb_content3!=''">
+				wb_content3=#{wb_content3},
+			</if>
+			<if test="wb_content4!=null and wb_content4!=''">
+				wb_content4=#{wb_content4},
+			</if>
+			<if test="wb_content5!=null and wb_content5!=''">
+				wb_content5=#{wb_content5},
+			</if>
+			
+			<if test="wb_content6!=null and wb_content6!=''">
+				wb_content6=#{wb_content6},
+			</if>
+			<if test="wb_content7!=null and wb_content7!=''">
+				wb_content7=#{wb_content7},
+			</if>
+			<if test="wb_content8!=null and wb_content8!=''">
+				wb_content8=#{wb_content8},
+			</if>
+			<if test="wb_content9!=null and wb_content9!=''">
+				wb_content9=#{wb_content9},
+			</if>
+			<if test="wb_content10!=null and wb_content10!=''">
+				wb_content10=#{wb_content10},
+			</if>
+			
+			<if test="wb_title1!=null and wb_title1!=''">
+				wb_title1=#{wb_title1},
+			</if>
+			<if test="wb_title2!=null and wb_title2!=''">
+				wb_title2=#{wb_title2},
+			</if>
+			<if test="wb_title3!=null and wb_title3!=''">
+				wb_title3=#{wb_title3},
+			</if>
+			<if test="wb_title4!=null and wb_title4!=''">
+				wb_title4=#{wb_title4},
+			</if>
+			<if test="wb_title5!=null and wb_title5!=''">
+				wb_title5=#{wb_title5},
+			</if>
+			<if test="wb_title6!=null and wb_title6!=''">
+				wb_title6=#{wb_title6},
+			</if>
+			<if test="wb_title7!=null and wb_title7!=''">
+				wb_title7=#{wb_title7},
+			</if>
+			<if test="wb_title8!=null and wb_title8!=''">
+				wb_title8=#{wb_title8},
+			</if>
+			<if test="wb_title9!=null and wb_title9!=''">
+				wb_title9=#{wb_title9},
+			</if>
+			<if test="wb_title10!=null and wb_title10!=''">
+				wb_title10=#{wb_title10},
+			</if>
+			<if test="wb_time!=null and wb_time!=''">
+				wb_time=#{wb_time},
+			</if>
+			
+		</set>
+		where user_uid=#{user_uid}
+	</update>
+</mapper>
